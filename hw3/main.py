@@ -59,16 +59,23 @@ def do_train(args, model, train_dataloader, save_dir="./out"):
             loss.backward()
             optimizer.step()
             lr_scheduler.step()
+
+            # Accumulate the loss
+            total_loss += loss.item()
             
+            #check update
             progress_bar.update(1)
+
+        # Calculate and print the average loss for this epoch
+        average_loss = total_loss / len(train_dataloader)
+        print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {average_loss:.4f}')
         
     ##### YOUR CODE ENDS HERE ######
 
     print("Training completed...")
     print("Saving Model....")
-    model.save_pretrained(save_dir)
 
-    return
+    return model.save_pretrained(save_dir)
 
 
 # Core evaluation function
