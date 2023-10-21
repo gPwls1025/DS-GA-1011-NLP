@@ -48,38 +48,20 @@ def do_train(args, model, train_dataloader, save_dir="./out"):
     for epoch in range(num_epochs):
         total_loss = 0.0
         for batch in train_dataloader:
-            # Move batch to GPU if available
-            batch = {k: v.to(args.device) for k, v in batch.items()}
-            
-            # Zero out gradients
-            optimizer.zero_grad()
-            
             # Forward pass
-            outputs = model(**batch)
-            
-            # Calculate loss
+            inputs, labels = batch['input_ids'], batch['label']
+            outputs = model(inputs, labels=labels)
             loss = outputs.loss
             
+            # Backward pass and optimization
+            optimizer.zero_grad()
             # Backpropagation
             loss.backward()
-            
-            # Accumulate the total loss
-            total_loss += loss.item()
-            
-            # Gradient clipping to prevent exploding gradients (optional but recommended)
-            torch.nn.utils.clip_grad_norm_(model.parameters(), args.max_grad_norm)
-            
-            # Update weights
             optimizer.step()
             lr_scheduler.step()
             
             progress_bar.update(1)
         
-        # Calculate and log the average loss for the epoch
-        average_loss = total_loss / len(train_dataloader)
-        print(f"Epoch {epoch + 1}/{num_epochs} - Average Loss: {average_loss:.4f}")
-
-
     ##### YOUR CODE ENDS HERE ######
 
     print("Training completed...")
