@@ -61,7 +61,7 @@ def do_train(args, model, train_dataloader, save_dir="./out"):
             lr_scheduler.step()
 
             # Accumulate the loss
-            total_loss += loss.item()
+            #total_loss += loss.item()
             
             #check update
             progress_bar.update(1)
