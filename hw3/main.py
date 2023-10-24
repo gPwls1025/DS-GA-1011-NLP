@@ -48,20 +48,22 @@ def do_train(args, model, train_dataloader, save_dir="./out"):
     for epoch in range(num_epochs):
         total_loss = 0.0
         for batch in train_dataloader:
-            # Forward pass
-            inputs, labels = batch['input_ids'], batch['label']
-            outputs = model(inputs, labels=labels)
-            loss = outputs.loss
-            
-            # Backward pass and optimization
+            # Move batch to GPU if available
+            batch = {k: v.to(args.device) for k, v in batch.items()}
+
+            # Zero out gradients
             optimizer.zero_grad()
+
+            # Forward pass
+            outputs = model(**batch)
+            loss = outputs.loss
+
             # Backpropagation
             loss.backward()
+            # Accumulate the loss
+            total_loss += loss.item()
             optimizer.step()
             lr_scheduler.step()
-
-            # Accumulate the loss
-            #total_loss += loss.item()
             
             #check update
             progress_bar.update(1)
