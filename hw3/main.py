@@ -49,17 +49,15 @@ def do_train(args, model, train_dataloader, save_dir="./out"):
         total_loss = 0.0
         for batch in train_dataloader:
             # Move batch to GPU if available
-            batch = {k: v.to(args.device) for k, v in batch.items()}
-            print(args.device)
-
-            # Zero out gradients
-            optimizer.zero_grad()
+            batch = {k: v.to('cuda') for k, v in batch.items()}
 
             # Forward pass
             outputs = model(**batch)
             loss = outputs.loss
 
             # Backpropagation
+            # Zero out gradients - make memory efficient 
+            optimizer.zero_grad()
             loss.backward()
             # Accumulate the loss
             total_loss += loss.item()
