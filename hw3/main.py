@@ -50,6 +50,7 @@ def do_train(args, model, train_dataloader, save_dir="./out"):
         for batch in train_dataloader:
             # Move batch to GPU if available
             batch = {k: v.to(args.device) for k, v in batch.items()}
+            print(args.device)
 
             # Zero out gradients
             optimizer.zero_grad()
