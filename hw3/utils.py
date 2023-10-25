@@ -49,7 +49,7 @@ def custom_transform(example):
 
     text = example["text"]
     words = word_tokenize(text)  # Tokenize the sentence into words
-    num_words_to_replace = int(0.3 * len(words))  # Calculate the number of words to replace (30% of total words)
+    num_words_to_replace = int(0.5 * len(words))  # Calculate the number of words to replace (30% of total words)
 
     for _ in range(num_words_to_replace):
         word_idx = random.randint(0, len(words) - 1)  # Randomly select a word index
