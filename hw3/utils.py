@@ -44,7 +44,30 @@ def custom_transform(example):
 
     # You should update example["text"] using your transformation
 
-    raise NotImplementedError
+    text = example["text"]
+    words = word_tokenize(text)  # Tokenize the sentence into words
+    num_words_to_replace = int(0.3 * len(words))  # Calculate the number of words to replace (30% of total words)
+
+    for _ in range(num_words_to_replace):
+        word_idx = random.randint(0, len(words) - 1)  # Randomly select a word index
+        word_to_replace = words[word_idx]
+
+        # Get synonyms for the selected word using WordNet
+        synonyms = []
+        for syn in wordnet.synsets(word_to_replace):
+            for lemma in syn.lemmas():
+                synonyms.append(lemma.name())
+
+        if synonyms:
+            # Randomly select a synonym to replace the word
+            synonym = random.choice(synonyms)
+            words[word_idx] = synonym
+
+    # Detokenize the modified words to get the transformed sentence
+    transformed_text = TreebankWordDetokenizer().detokenize(words)
+
+    # Update the example with the transformed text
+    example["text"] = transformed_text
 
     ##### YOUR CODE ENDS HERE ######
 
