@@ -13,6 +13,9 @@ import argparse
 from nltk.corpus import wordnet
 from nltk import word_tokenize
 from nltk.tokenize.treebank import TreebankWordDetokenizer
+import nltk
+
+nltk.download("punkt")
 
 random.seed(0)
 
