@@ -139,7 +139,7 @@ def create_augmented_dataloader(args, dataset):
         augmented_train_dataset,
         batch_size=args.batch_size,
         shuffle=True,
-        num_workers=args.num_workers,
+        num_workers=getattr(args, 'num_workers', 0),
     )
 
     return train_dataloader
