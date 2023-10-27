@@ -1,7 +1,7 @@
 import datasets
 from datasets import load_dataset
 from transformers import AutoTokenizer
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, ConcatDataset, random_split
 from transformers import AutoModelForSequenceClassification
 from torch.optim import AdamW
 from transformers import get_scheduler
@@ -115,12 +115,47 @@ def create_augmented_dataloader(args, dataset):
     # Here, 'dataset' is the original dataset. You should return a dataloader called 'train_dataloader' -- this
     # dataloader will be for the original training split augmented with 5k random transformed examples from the training set.
     # You may find it helpful to see how the dataloader was created at other place in this code.
+    
+    aug_n = 5000
+    # Split the original dataset into training and validation sets
+    train_size = int(0.8 * len(dataset))
+    val_size = len(dataset) - train_size
+    train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
-    raise NotImplementedError
+    # Create a dataloader for the original training data
+    train_dataloader = DataLoader(
+        train_dataset,
+        batch_size=args.batch_size,
+        shuffle=True,
+        num_workers=args.num_workers,
+    )
 
-    ##### YOUR CODE ENDS HERE ######
 
-    return train_dataloader
+    # Create a list to store the augmented examples
+    augmented_examples = []
+
+    # Apply the custom_transform to randomly selected training examples
+    for _ in range(aug_n):
+        random_idx = random.randint(0, len(train_dataset) - 1)
+        example = train_dataset[random_idx]
+        transformed_example = custom_transform(example)  # Assuming you have a custom_transform function
+        augmented_examples.append(transformed_example)
+
+    # Create a dataset from the augmented examples
+    augmented_dataset = datasets.Dataset(augmented_examples)
+
+    # Combine the original training dataset with the augmented dataset
+    combined_dataset = ConcatDataset([train_dataset, augmented_dataset])
+
+    # Create a dataloader for the combined training data
+    combined_train_dataloader = DataLoader(
+        combined_dataset,
+        batch_size=args.batch_size,
+        shuffle=True,
+        num_workers=args.num_workers,
+    )
+
+    return combined_train_dataloader
 
 
 # Create a dataloader for the transformed test set
