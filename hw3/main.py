@@ -131,8 +131,8 @@ def create_augmented_dataloader(args, dataset):
         augmented_example = custom_transform(original_example.copy())  # Make a copy to avoid modifying the original
         augmented_examples.append(augmented_example)
 
-    # Combine the original training dataset with augmented examples
-    augmented_train_dataset = train_dataset + augmented_examples
+    # Combine the original training dataset with augmented examples using ConcatDataset
+    augmented_train_dataset = ConcatDataset([train_dataset] + augmented_examples)
 
     # Create a DataLoader for the augmented training dataset
     train_dataloader = DataLoader(
