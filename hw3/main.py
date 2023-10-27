@@ -116,46 +116,33 @@ def create_augmented_dataloader(args, dataset):
     # dataloader will be for the original training split augmented with 5k random transformed examples from the training set.
     # You may find it helpful to see how the dataloader was created at other place in this code.
     
-    aug_n = 5000
-    # Split the original dataset into training and validation sets
-    train_size = int(0.8 * len(dataset))
-    val_size = len(dataset) - train_size
-    train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+    num_augmented_examples = 5000
 
-    # Create a dataloader for the original training data
-    train_dataloader = DataLoader(
-        train_dataset,
-        batch_size=args.batch_size,
-        shuffle=True,
-        num_workers=args.num_workers,
-    )
-
+    # Get the original training dataset
+    train_dataset = dataset['train']
 
     # Create a list to store the augmented examples
     augmented_examples = []
 
-    # Apply the custom_transform to randomly selected training examples
-    for _ in range(aug_n):
-        random_idx = random.randint(0, len(train_dataset) - 1)
-        example = train_dataset[random_idx]
-        transformed_example = custom_transform(example)  # Assuming you have a custom_transform function
-        augmented_examples.append(transformed_example)
+    # Apply the custom transformation to generate augmented examples
+    for _ in range(num_augmented_examples):
+        random_index = random.randint(0, len(train_dataset) - 1)
+        original_example = train_dataset[random_index]
+        augmented_example = custom_transform(original_example.copy())  # Make a copy to avoid modifying the original
+        augmented_examples.append(augmented_example)
 
-    # Create a dataset from the augmented examples
-    augmented_dataset = datasets.Dataset(augmented_examples)
+    # Combine the original training dataset with augmented examples
+    augmented_train_dataset = train_dataset + augmented_examples
 
-    # Combine the original training dataset with the augmented dataset
-    combined_dataset = ConcatDataset([train_dataset, augmented_dataset])
-
-    # Create a dataloader for the combined training data
-    combined_train_dataloader = DataLoader(
-        combined_dataset,
+    # Create a DataLoader for the augmented training dataset
+    train_dataloader = DataLoader(
+        augmented_train_dataset,
         batch_size=args.batch_size,
         shuffle=True,
         num_workers=args.num_workers,
     )
 
-    return combined_train_dataloader
+    return train_dataloader
 
 
 # Create a dataloader for the transformed test set
