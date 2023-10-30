@@ -1,5 +1,5 @@
 import datasets
-from datasets import load_dataset
+from datasets import load_dataset, concatenate_datasets
 from transformers import AutoTokenizer
 from torch.utils.data import DataLoader, ConcatDataset, random_split
 from transformers import AutoModelForSequenceClassification
@@ -116,17 +116,18 @@ def create_augmented_dataloader(args, dataset):
     # dataloader will be for the original training split augmented with 5k random transformed examples from the training set.
     # You may find it helpful to see how the dataloader was created at other place in this code.
     
+    #(keep same structure to create_transformed_dataloader) 
     #get 5000 random transformed samples
     random_samples = dataset['train'].shuffle(seed=42).select(range(5000))
-    transformed_df = random_samples.map(custom_transform, load_from_cache_file=False)
+    transformed_examples = random_samples.map(custom_transform, load_from_cache_file=False)
 
     # Get the original training dataset
     train_df = dataset['train']
 
     #combine train_df and transformed_df
-    combined_df = datasets.concatenate_datasets([train_df, transformed_df])
+    combined_df = concatenate_datasets([train_df, transformed_examples])
 
-    #Tokenize (keep same structure to create_transformed_dataloader) 
+    #Tokenize 
     combined_tokenized_df = combined_df.map(tokenize_function, batched=True, load_from_cache_file=False)
     combined_tokenized_df = combined_tokenized_df.remove_columns(["text"])
     combined_tokenized_df = combined_tokenized_df.rename_column("label", "labels")
@@ -136,6 +137,8 @@ def create_augmented_dataloader(args, dataset):
     train_dataloader = DataLoader(
         combined_tokenized_df,
         batch_size=args.batch_size,
+        shuffle=True,
+        num_workers=args.num_workers,
     )
 
     return train_dataloader
