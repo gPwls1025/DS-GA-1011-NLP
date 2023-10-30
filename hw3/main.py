@@ -138,7 +138,6 @@ def create_augmented_dataloader(args, dataset):
         combined_tokenized_df,
         batch_size=args.batch_size,
         shuffle=True,
-        num_workers=args.num_workers,
     )
 
     return train_dataloader
