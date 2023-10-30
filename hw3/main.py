@@ -116,30 +116,26 @@ def create_augmented_dataloader(args, dataset):
     # dataloader will be for the original training split augmented with 5k random transformed examples from the training set.
     # You may find it helpful to see how the dataloader was created at other place in this code.
     
-    num_augmented_examples = 5000
+    #get 5000 random transformed samples
+    random_samples = dataset['train'].shuffle(seed=42).select(range(5000))
+    transformed_df = random_samples.map(custom_transform, load_from_cache_file=False)
 
     # Get the original training dataset
-    train_dataset = dataset['train']
+    train_df = dataset['train']
 
-    # Create a list to store the augmented examples
-    augmented_examples = []
+    #combine train_df and transformed_df
+    combined_df = datasets.concatenate_datasets([train_df, transformed_df])
 
-    # Apply the custom transformation to generate augmented examples
-    for _ in range(num_augmented_examples):
-        random_index = random.randint(0, len(train_dataset) - 1)
-        original_example = train_dataset[random_index]
-        augmented_example = custom_transform(original_example.copy())  # Make a copy to avoid modifying the original
-        augmented_examples.append(augmented_example)
+    #Tokenize (keep same structure to create_transformed_dataloader) 
+    combined_tokenized_df = combined_df.map(tokenize_function, batched=True, load_from_cache_file=False)
+    combined_tokenized_df = combined_tokenized_df.remove_columns(["text"])
+    combined_tokenized_df = combined_tokenized_df.rename_column("label", "labels")
+    combined_tokenized_df.set_format("torch")
 
-    # Combine the original training dataset with augmented examples using ConcatDataset
-    augmented_train_dataset = ConcatDataset([train_dataset] + augmented_examples)
-
-    # Create a DataLoader for the augmented training dataset
+    # Create a DataLoader 
     train_dataloader = DataLoader(
-        augmented_train_dataset,
+        combined_tokenized_df,
         batch_size=args.batch_size,
-        shuffle=True,
-        num_workers=getattr(args, 'num_workers', 0),
     )
 
     return train_dataloader
