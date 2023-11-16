@@ -20,7 +20,13 @@ def your_prompt():
     Example: a=1111, b=2222, prefix='Input: ', suffix='\nOutput: '
     """
     #prefix = '''Question: what is 1234567+1234567?\nAnswer: 2469134\nQuestion: what is '''
-    prefix = """Question: What is 1234567 + 7654321?\nAnswer: 8888888\nQuestion: What is 2345678 + 8765432?\nAnswer: 11111110\nQuestion: What is """
+    prefix = """Question: What is 1234567 + 7654321?\nAnswer: 8888888\nQuestion: What is 2345678 + 8765432?\nAnswer: 11111110\n
+    Question: What is 5907670 + 8961742?\nAnswer: 14869412\nQuestion: What is 3528570 + 3195626?\nAnswer: 6724196\n
+    Question: What is 1775918 + 9055957?\nAnswer: 10831875\nQuestion: What is 4783276 + 7484357?\nAnswer: 12267633\n
+    Question: What is 2402853 + 6760529?\nAnswer: 9163382\nQuestion: What is 3791408 + 3033665?\nAnswer: 6825073\n
+    Question: What is 2334899 + 3190456?\nAnswer: 5525355\nQuestion: What is 1111111 + 2222222?\nAnswer: 3333333\n
+    Question: What is 9402239 + 9542415?\nAnswer: 18944654\nQuestion: What is 3224126 + 1488374?\nAnswer: 4712500\n
+    Question: What is """
 
     suffix = '?\nAnswer: '
 
