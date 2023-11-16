@@ -8,7 +8,7 @@ import re
 
 # api key for query. see https://docs.together.ai/docs/get-started
 def your_api_key():
-    YOUR_API_KEY = 'YOUR_API_KEY'
+    YOUR_API_KEY = '9e3c2abd5e605c5f5d36f6760aefb82246de307313704f78884784dc149537d0'
     return YOUR_API_KEY
 
 
@@ -19,7 +19,8 @@ def your_prompt():
         A string.
     Example: a=1111, b=2222, prefix='Input: ', suffix='\nOutput: '
     """
-    prefix = '''Question: what is 1234567+1234567?\nAnswer: 2469134\nQuestion: what is '''
+    #prefix = '''Question: what is 1234567+1234567?\nAnswer: 2469134\nQuestion: what is '''
+    prefix = """Question: What is 1234567 + 7654321?\nAnswer: 8888888\nQuestion: What is 2345678 + 8765432?\nAnswer: 11111110\nQuestion: What is """
 
     suffix = '?\nAnswer: '
 
@@ -37,9 +38,9 @@ def your_config():
     """
     config = {
         'max_tokens': 50, # max_tokens must be >= 50 because we don't always have prior on output length 
-        'temperature': 0.7,
-        'top_k': 50,
-        'top_p': 0.7,
+        'temperature': 0.5,
+        'top_k': 40,
+        'top_p': 0.6,
         'repetition_penalty': 1,
         'stop': []}
     
